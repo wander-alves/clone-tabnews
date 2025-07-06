@@ -1,6 +1,6 @@
 import Head from "next/head";
 
-import './style.css'
+import "./style.css";
 
 export default function Home() {
   return (
@@ -10,13 +10,17 @@ export default function Home() {
       </Head>
       <main>
         <div className="content-container">
-          <img src='/marvin-without-background.png' alt='Marvin' />
+          <img src="/marvin-without-background.png" alt="Marvin" />
           <div>
-            <h1>Life! <br /> Don't talk to me about life!</h1>
-            <em><q>Marvin, the Paranoid Android</q></em>
+            <h1>
+              Life! <br /> Don't talk to me about life!
+            </h1>
+            <em>
+              <q>Marvin, the Paranoid Android</q>
+            </em>
           </div>
         </div>
       </main>
     </>
-  )
+  );
 }
