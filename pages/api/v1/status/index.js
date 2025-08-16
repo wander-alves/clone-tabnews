@@ -1,6 +1,6 @@
 function status(request, response) {
   return response.status(200).json({
-    message: "It's ALIVE!!!.",
+    message: "It's ALIVE!!!",
   });
 }
 
