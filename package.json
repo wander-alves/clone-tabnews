@@ -5,7 +5,7 @@
   "main": "./pages/index.js",
   "type": "module",
   "scripts": {
-    "dev": "npm run services:up && next dev",
+    "dev": "next dev",
     "services:up": "docker compose -f ./cursodev/compose.yaml up -d",
     "services:stop": "docker compose -f ./cursodev/compose.yaml stop",
     "services:down": "docker compose -f ./cursodev/compose.yaml down",
