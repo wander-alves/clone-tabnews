@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "./pages/index.js",
-  "type": "module",
   "scripts": {
     "dev": "next dev",
     "services:up": "docker compose -f ./cursodev/compose.yaml up -d",
@@ -11,8 +10,8 @@
     "services:down": "docker compose -f ./cursodev/compose.yaml down",
     "lint:check": "prettier --check .",
     "lint:fix": "prettier --write .",
-    "test": "jest",
-    "test:watch": "jest --watchAll",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watchAll --runInBand",
     "migration:create": "node-pg-migrate -m ./infra/migrations/ create",
     "migreation:up": "node-pg-migrate --envPath ./.env.development up"
   },
