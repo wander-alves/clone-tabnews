@@ -4,6 +4,7 @@ import { join } from "node:path";
 
 async function migrations(request, response) {
   const dbClient = await database.getDbClient();
+  console.log(dbClient);
 
   const migrationSettings = {
     dbClient,
