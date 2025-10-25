@@ -3,8 +3,14 @@ import migrationRunner from "node-pg-migrate";
 import { join } from "node:path";
 
 async function migrations(request, response) {
-  const dbClient = await database.getDbClient();
-  console.log(dbClient);
+  const allowedMethods = ["POST", "GET"];
+  if (!allowedMethods.includes(request.method)) {
+    return response.status(405).json({
+      error: `Unauthorized method: ${request.method}`,
+    });
+  }
+
+  let dbClient;
 
   const migrationSettings = {
     dbClient,
@@ -15,30 +21,33 @@ async function migrations(request, response) {
     pgmigrationsTable: "pgmigrations",
   };
 
-  if (request.method === "GET") {
-    const pendingMigrations = await migrationRunner({
-      ...migrationSettings,
-      dryRun: true,
-    });
+  try {
+    dbClient = await database.getDbClient();
 
-    await dbClient.end();
+    if (request.method === "GET") {
+      const pendingMigrations = await migrationRunner({
+        ...migrationSettings,
+        dryRun: true,
+      });
 
-    return response.json(pendingMigrations);
-  }
-
-  if (request.method === "POST") {
-    const executedMigrations = await migrationRunner(migrationSettings);
-
-    await dbClient.end();
-
-    if (executedMigrations.length > 0) {
-      return response.status(201).json(executedMigrations);
+      return response.json(pendingMigrations);
     }
 
-    return response.status(200).json(executedMigrations);
-  }
+    if (request.method === "POST") {
+      const executedMigrations = await migrationRunner(migrationSettings);
 
-  return response.status(405).send();
+      if (executedMigrations.length > 0) {
+        return response.status(201).json(executedMigrations);
+      }
+
+      return response.status(200).json(executedMigrations);
+    }
+  } catch (error) {
+    console.log(error);
+    throw error;
+  } finally {
+    await dbClient.end();
+  }
 }
 
 export default migrations;
