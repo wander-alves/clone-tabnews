@@ -1,3 +1,9 @@
+import orchestrator from "tests/orchestrator.js";
+
+beforeAll(async () => {
+  await orchestrator.waitForAllServices();
+});
+
 test("[GET] should status endpoint point return 200 when requested.", async () => {
   const response = await fetch("http://localhost:3000/api/v1/status");
 
