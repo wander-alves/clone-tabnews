@@ -13,6 +13,7 @@ Falando mais detalhadamente sobre as tecnologias que iremos utilizar no projeto,
 O que utilizamos para construir o projeto até o momento:
 
 - JavaScript
+- Jest
 - Next.js e React.js
 - Git
 - GitHub
