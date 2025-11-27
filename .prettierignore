@@ -1,2 +1,5 @@
 .next
 .vscode
+*.md
+*.yaml
+*.json
