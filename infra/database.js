@@ -24,11 +24,6 @@ async function query(queryObject) {
   }
 }
 
-export default {
-  query,
-  getDbClient,
-};
-
 function getSSLValues() {
   if (process.env.POSTGRES_CA) {
     return {
@@ -37,3 +32,10 @@ function getSSLValues() {
   }
   return process.env.NODE_ENV === "production" ? true : false;
 }
+
+const database = {
+  query,
+  getDbClient,
+};
+
+export default database;

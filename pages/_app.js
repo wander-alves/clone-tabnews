@@ -1,4 +1,6 @@
+/*eslint-disable react/no-unescaped-entities*/
 import Head from "next/head";
+import Image from "next/image";
 
 import "./style.css";
 
@@ -10,7 +12,7 @@ export default function Home() {
       </Head>
       <main>
         <div className="content-container">
-          <img src="/marvin-without-background.png" alt="Marvin" />
+          <Image src="/marvin-without-background.png" alt="Marvin" />
           <div>
             <h1>
               Life! <br /> Don't talk to me about life!
