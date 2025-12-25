@@ -9,7 +9,7 @@ async function status(request, response) {
   const dbMaxConnectionsQuery = await database.query("SHOW max_connections;");
 
   const dbMaxConnections = parseInt(
-    dbMaxConnectionsQuery.rows[0].max_connections
+    dbMaxConnectionsQuery.rows[0].max_connections,
   );
 
   const databaseName = process.env.POSTGRES_DB;
