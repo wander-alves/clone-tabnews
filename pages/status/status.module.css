@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
 
-  &>h1 {
+  & > h1 {
     font-size: 3rem;
     margin-bottom: 1.5rem;
   }
@@ -23,7 +23,7 @@
   flex-direction: column;
   gap: 0.5rem;
 
-  &>progress {
+  & > progress {
     width: 100%;
     appearance: none;
     -moz-appearance: none;
@@ -32,11 +32,11 @@
     overflow: hidden;
 
     &::-webkit-progress-bar {
-      background: #E3E3ED;
+      background: #e3e3ed;
     }
 
     &::-moz-progress-bar {
-      background: #E3E3ED;
+      background: #e3e3ed;
     }
 
     &[data-is-healthy="true"] {
@@ -51,7 +51,6 @@
       }
     }
   }
-
 }
 
 .progress-bar-info {
