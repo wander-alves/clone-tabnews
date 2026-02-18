@@ -17,3 +17,34 @@ O que utilizamos para construir o projeto até o momento:
 - Next.js e React.js
 - Git
 - GitHub
+
+## Endpoints
+
+*Listar migrations pendentes:*
+`[GET] /api/v1/migrations`
+
+*Executar migrations pendentes:*
+`[POST] /api/v1/migrations`
+
+*Criação de um usuários:*
+`[POST] /api/v1/users`
+
+*Busca de um usuário específico:*
+`[GET] /api/v1/users/[username]`
+
+## Estrutura/Modelagem das tabelas 
+
+**Users**
+Referências: [Ruby On Rails: Migrations Guide](https://guides.rubyonrails.org/active_record_migrations.html)
+
+- id: UUID V4 gerado pelo banco
+- username: Nome de usuário com limite de 30 caracteres.
+  - [Motivação da decisão]()
+- email: E-mail de usuário com limite de 256 caracteres.
+  - [Motivação da decisão](https://stackoverflow.com/questions/1199190/what-is-the-optimal-length-for-an-email-address-in-a-database/1199238#1199238)
+- password: E-mail de usuário com limite de 256 caracteres.
+  - [Motivação da decisão](https://security.stackexchange.com/questions/39849/does-bcrypt-have-a-maximum-password-length/39851#39851)
+- created_at: Data de criação de um usuário seguindo o padrão Timestamp UTC.
+  - [Motivação da decisão](https://justatheory.com/2012/04/postgres-use-timestamptz/)
+- updated_at: Data de atualização de um usuário seguindo o padrão Timestamp UTC.
+  - [Motivação da decisão](https://justatheory.com/2012/04/postgres-use-timestamptz/)
