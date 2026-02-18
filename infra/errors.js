@@ -59,6 +59,27 @@ class ValidationError extends Error {
   }
 }
 
+class NotFoundError extends Error {
+  constructor({ cause, message, action }) {
+    super(message || "Não foi possível localizar o recurso informado.", {
+      cause,
+    });
+    this.name = "NotFoundError";
+    this.action =
+      action || "Por favor, verifique os valores informados e tente novamente.";
+    this.statusCode = 404;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.statusCode,
+    };
+  }
+}
+
 class MethodNotAllowedError extends Error {
   constructor() {
     super("O método utilizado não é suportado pelo endpoint.");
@@ -82,4 +103,5 @@ export {
   MethodNotAllowedError,
   ServiceError,
   ValidationError,
+  NotFoundError,
 };
