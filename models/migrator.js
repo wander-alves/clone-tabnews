@@ -10,7 +10,7 @@ const migrationSettings = {
   dir: resolve("infra", "migrations"),
   direction: "up",
   log: () => {},
-  pgmigrationsTable: "pgmigrations",
+  migrationsTable: "pgmigrations",
 };
 
 async function listPendingMigrations() {
