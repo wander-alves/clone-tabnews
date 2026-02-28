@@ -10,13 +10,15 @@ function getNumberOfRounds() {
   return rounds;
 }
 
+const secret = process.env.BCRYPT_SECRET;
+
 async function hash(password) {
   const rounds = getNumberOfRounds();
-  return bcryptjs.hash(password, rounds);
+  return bcryptjs.hash(secret + password, rounds);
 }
 
 async function compare(password, passwordHash) {
-  return await bcryptjs.compare(password, passwordHash);
+  return await bcryptjs.compare(secret + password, passwordHash);
 }
 
 const password = {
