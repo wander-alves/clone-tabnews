@@ -1,53 +1,15 @@
 import database from "infra/database.js";
+import password from "./password.js";
 import { ValidationError, NotFoundError } from "infra/errors.js";
 
-async function create({ username, email, password }) {
-  await validateUniqueEmail(email);
-  await validateUniqueUsername(username);
+async function create(userInputObject) {
+  await validateUniqueUsername(userInputObject.username);
+  await validateUniqueEmail(userInputObject.email);
+  await hashPasswordInObject(userInputObject);
 
-  const newUser = await runInsertQuery({ username, email, password });
+  const newUser = await runInsertQuery(userInputObject);
 
   return newUser;
-
-  async function validateUniqueEmail(email) {
-    const result = await database.query({
-      text: `
-        SELECT
-          email
-        FROM 
-          users
-        WHERE
-          LOWER(email) = LOWER($1)
-      ;`,
-      values: [email],
-    });
-    if (result.rowCount > 0) {
-      throw new ValidationError({
-        message: "O e-mail informado já está registrado.",
-        action: "Utilize outro endereço de e-mail para realizar o cadastro.",
-      });
-    }
-  }
-
-  async function validateUniqueUsername(username) {
-    const result = await database.query({
-      text: `
-        SELECT
-          username
-        FROM 
-          users
-        WHERE
-          LOWER(username) = LOWER($1)
-      ;`,
-      values: [username],
-    });
-    if (result.rowCount > 0) {
-      throw new ValidationError({
-        message: "O username informado já está registrado.",
-        action: "Utilize outro endereço de usuário para realizar o cadastro.",
-      });
-    }
-  }
 
   async function runInsertQuery({ username, email, password }) {
     const result = await database.query({
@@ -60,6 +22,48 @@ async function create({ username, email, password }) {
           *
       ;`,
       values: [username, email, password],
+    });
+    return result.rows[0];
+  }
+}
+
+async function update(username, userInputObject) {
+  const userFound = await findOneByUsername(username);
+
+  if (userInputObject.username) {
+    await validateUniqueUsername(userInputObject.username);
+  }
+
+  if (userInputObject.email) {
+    await validateUniqueEmail(userInputObject.email);
+  }
+
+  if (userInputObject.password) {
+    await hashPasswordInObject(userInputObject);
+  }
+
+  const userWithUpdatedValues = { ...userFound, ...userInputObject };
+
+  const updatedUser = await runUpdateQuery(userWithUpdatedValues);
+
+  return updatedUser;
+
+  async function runUpdateQuery({ id, username, email, password }) {
+    const result = await database.query({
+      text: `
+        UPDATE 
+          users
+        SET
+          username = $2,
+          email =  $3,
+          password =  $4,
+          updated_at = timezone('utc', now())
+        WHERE
+          id = $1
+        RETURNING
+          *
+      ;`,
+      values: [id, username, email, password],
     });
     return result.rows[0];
   }
@@ -96,8 +100,56 @@ async function findOneByUsername(username) {
   }
 }
 
+async function validateUniqueUsername(username) {
+  const result = await database.query({
+    text: `
+      SELECT
+        username
+      FROM 
+        users
+      WHERE
+        LOWER(username) = LOWER($1)
+    ;`,
+    values: [username],
+  });
+
+  if (result.rowCount > 0) {
+    throw new ValidationError({
+      message: "O username informado já está registrado.",
+      action: "Utilize outro nome de usuário para realizar esta operação.",
+    });
+  }
+}
+
+async function validateUniqueEmail(email) {
+  const result = await database.query({
+    text: `
+      SELECT
+        email
+      FROM 
+        users
+      WHERE
+        LOWER(email) = LOWER($1)
+    ;`,
+    values: [email],
+  });
+
+  if (result.rowCount > 0) {
+    throw new ValidationError({
+      message: "O e-mail informado já está registrado.",
+      action: "Utilize outro endereço de e-mail para realizar esta operação.",
+    });
+  }
+}
+
+async function hashPasswordInObject(userInputObject) {
+  const hashedPassword = await password.hash(userInputObject.password);
+  userInputObject.password = hashedPassword;
+}
+
 const user = {
   create,
+  update,
   findOneByUsername,
 };
 
