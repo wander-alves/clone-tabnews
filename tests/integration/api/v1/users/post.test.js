@@ -1,6 +1,6 @@
 import { version as uuidVersion } from "uuid";
-import orchestrator from "tests/orchestrator.js";
 
+import orchestrator from "tests/orchestrator.js";
 import user from "models/user.js";
 import password from "models/password.js";
 
@@ -59,42 +59,6 @@ describe("[POST] /api/v1/users", () => {
       expect(incorrectPasswordMatch).toBe(false);
     });
 
-    test("it should not be able to register a duplicated e-mail", async () => {
-      await fetch("http://localhost:3000/api/v1/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: "jane.doe",
-          email: "jane.doe@example.com",
-          password: "strongpassword",
-        }),
-      });
-
-      const response = await fetch("http://localhost:3000/api/v1/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: "jane-doe",
-          email: "Jane.doe@example.com",
-          password: "strongpassword",
-        }),
-      });
-
-      const body = await response.json();
-
-      expect(response.status).toBe(400);
-      expect(body).toEqual({
-        name: "ValidationError",
-        message: "O e-mail informado já está registrado.",
-        action: "Utilize outro endereço de e-mail para realizar o cadastro.",
-        status_code: 400,
-      });
-    });
-
     test("it should not be able to register a duplicated username", async () => {
       await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
@@ -126,7 +90,43 @@ describe("[POST] /api/v1/users", () => {
       expect(body).toEqual({
         name: "ValidationError",
         message: "O username informado já está registrado.",
-        action: "Utilize outro endereço de usuário para realizar o cadastro.",
+        action: "Utilize outro nome de usuário para realizar esta operação.",
+        status_code: 400,
+      });
+    });
+
+    test("it should not be able to register a duplicated e-mail", async () => {
+      await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: "jane.doe",
+          email: "jane.doe@example.com",
+          password: "strongpassword",
+        }),
+      });
+
+      const response = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: "jane-doe",
+          email: "Jane.doe@example.com",
+          password: "strongpassword",
+        }),
+      });
+
+      const body = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(body).toEqual({
+        name: "ValidationError",
+        message: "O e-mail informado já está registrado.",
+        action: "Utilize outro endereço de e-mail para realizar esta operação.",
         status_code: 400,
       });
     });
