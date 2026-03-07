@@ -14,20 +14,12 @@ beforeAll(async () => {
 describe("[GET] /api/v1/users/[username]/", () => {
   describe("Anonymous user", () => {
     test("it should be able to search username with exact case match", async () => {
-      await fetch("http://localhost:3000/api/v1/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: "JohnDoe",
-          email: "john.doe@example.com",
-          password: "strongpassword",
-        }),
+      const createdUser = await orchestrator.createUser({
+        username: "JohnDoe",
       });
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/users/JohnDoe",
+        `http://localhost:3000/api/v1/users/${createdUser.username}`,
       );
 
       expect(response.status).toBe(200);
@@ -36,7 +28,7 @@ describe("[GET] /api/v1/users/[username]/", () => {
       expect(body).toEqual({
         id: body.id,
         username: "JohnDoe",
-        email: "john.doe@example.com",
+        email: body.email,
         password: body.password,
         created_at: body.created_at,
         updated_at: body.updated_at,
@@ -47,20 +39,12 @@ describe("[GET] /api/v1/users/[username]/", () => {
     });
 
     test("it should be able to search username with case mismatch", async () => {
-      await fetch("http://localhost:3000/api/v1/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: "janedoe",
-          email: "jane.doe@example.com",
-          password: "strongpassword",
-        }),
+      const createdUser = await orchestrator.createUser({
+        username: "janedoe",
       });
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/users/JaneDoe",
+        `http://localhost:3000/api/v1/users/${createdUser.username}`,
       );
 
       expect(response.status).toBe(200);
@@ -69,7 +53,7 @@ describe("[GET] /api/v1/users/[username]/", () => {
       expect(body).toEqual({
         id: body.id,
         username: "janedoe",
-        email: "jane.doe@example.com",
+        email: body.email,
         password: body.password,
         created_at: body.created_at,
         updated_at: body.updated_at,
