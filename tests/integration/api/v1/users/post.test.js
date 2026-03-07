@@ -60,17 +60,7 @@ describe("[POST] /api/v1/users", () => {
     });
 
     test("it should not be able to register a duplicated username", async () => {
-      await fetch("http://localhost:3000/api/v1/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: "jane.doe",
-          email: "jane.doe@example.com",
-          password: "strongpassword",
-        }),
-      });
+      const createdUser = await orchestrator.createUser();
 
       const response = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
@@ -78,9 +68,9 @@ describe("[POST] /api/v1/users", () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: "Jane.Doe",
-          email: "jane-doe@example.com",
-          password: "strongpassword",
+          username: createdUser.username,
+          email: createdUser.email,
+          password: createdUser.password,
         }),
       });
 
@@ -96,17 +86,7 @@ describe("[POST] /api/v1/users", () => {
     });
 
     test("it should not be able to register a duplicated e-mail", async () => {
-      await fetch("http://localhost:3000/api/v1/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: "jane.doe",
-          email: "jane.doe@example.com",
-          password: "strongpassword",
-        }),
-      });
+      const createdUser = await orchestrator.createUser();
 
       const response = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
@@ -114,9 +94,9 @@ describe("[POST] /api/v1/users", () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: "jane-doe",
-          email: "Jane.doe@example.com",
-          password: "strongpassword",
+          username: "joseph-doe",
+          email: createdUser.email,
+          password: createdUser.password,
         }),
       });
 
