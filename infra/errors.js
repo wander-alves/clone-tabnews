@@ -80,6 +80,28 @@ class NotFoundError extends Error {
   }
 }
 
+class UnauthorizedError extends Error {
+  constructor({ cause, message, action }) {
+    super(message || "Não foi possível localizar o recurso informado.", {
+      cause,
+    });
+    this.name = "UnauthorizedError";
+    this.action =
+      action ||
+      "Não foi possível realizar a ação. Por favor, efetue o login novamente";
+    this.statusCode = 401;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.statusCode,
+    };
+  }
+}
+
 class MethodNotAllowedError extends Error {
   constructor() {
     super("O método utilizado não é suportado pelo endpoint.");
@@ -104,4 +126,5 @@ export {
   ServiceError,
   ValidationError,
   NotFoundError,
+  UnauthorizedError,
 };
