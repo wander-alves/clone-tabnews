@@ -100,6 +100,37 @@ async function findOneByUsername(username) {
   }
 }
 
+async function findOneByEmail(email) {
+  const newUser = await runSelectQuery(email);
+
+  return newUser;
+
+  async function runSelectQuery(email) {
+    const result = await database.query({
+      text: `
+        SELECT
+          *
+        FROM 
+          users
+        WHERE
+          LOWER(email) = LOWER($1)
+        LIMIT
+          1
+      ;`,
+      values: [email],
+    });
+
+    if (result.rowCount === 0) {
+      throw new NotFoundError({
+        message: "Não foi possível localizar o usuário informado.",
+        action: "Verifique o email informado e tente novamente.",
+      });
+    }
+
+    return result.rows[0];
+  }
+}
+
 async function validateUniqueUsername(username) {
   const result = await database.query({
     text: `
@@ -151,6 +182,7 @@ const user = {
   create,
   update,
   findOneByUsername,
+  findOneByEmail,
 };
 
 export default user;
