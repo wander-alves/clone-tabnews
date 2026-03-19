@@ -14,7 +14,7 @@ beforeAll(async () => {
   await cleanDatabase();
 });
 
-describe("[PATCH] /api/v1/users/[username]/", () => {
+describe("[PATCH] /api/v1/users/[username]", () => {
   describe("Anonymous user", () => {
     test("it should not be able to change an unexistent user", async () => {
       const response = await fetch(
