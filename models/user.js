@@ -69,10 +69,41 @@ async function update(username, userInputObject) {
   }
 }
 
-async function findOneByUsername(username) {
-  const newUser = await runSelectQuery(username);
+async function findOneById(userId) {
+  const userFound = await runSelectQuery(userId);
 
-  return newUser;
+  return userFound;
+
+  async function runSelectQuery(userId) {
+    const result = await database.query({
+      text: `
+        SELECT
+          *
+        FROM 
+          users
+        WHERE
+          id = $1
+        LIMIT
+          1
+      ;`,
+      values: [userId],
+    });
+
+    if (result.rowCount === 0) {
+      throw new NotFoundError({
+        message: "Não foi possível localizar o usuário informado.",
+        action: "Verifique o username informado e tente novamente.",
+      });
+    }
+
+    return result.rows[0];
+  }
+}
+
+async function findOneByUsername(username) {
+  const userFound = await runSelectQuery(username);
+
+  return userFound;
 
   async function runSelectQuery(username) {
     const result = await database.query({
@@ -101,9 +132,9 @@ async function findOneByUsername(username) {
 }
 
 async function findOneByEmail(email) {
-  const newUser = await runSelectQuery(email);
+  const userFound = await runSelectQuery(email);
 
-  return newUser;
+  return userFound;
 
   async function runSelectQuery(email) {
     const result = await database.query({
@@ -181,6 +212,7 @@ async function hashPasswordInObject(userInputObject) {
 const user = {
   create,
   update,
+  findOneById,
   findOneByUsername,
   findOneByEmail,
 };
