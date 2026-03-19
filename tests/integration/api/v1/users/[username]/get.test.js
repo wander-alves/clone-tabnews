@@ -11,7 +11,7 @@ beforeAll(async () => {
   await cleanDatabase();
 });
 
-describe("[GET] /api/v1/users/[username]/", () => {
+describe("[GET] /api/v1/users/[username]", () => {
   describe("Anonymous user", () => {
     test("it should be able to search username with exact case match", async () => {
       const createdUser = await orchestrator.createUser({
