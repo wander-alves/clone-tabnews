@@ -176,6 +176,18 @@ describe("[GET] /api/v1/user", () => {
         action: "Verifique se o usuário está autenticado e tente novamente.",
         status_code: 401,
       });
+
+      const cookies = setCookieParser(response, {
+        map: true,
+      });
+
+      expect(cookies.session_id).toEqual({
+        name: "session_id",
+        value: "invalid",
+        path: "/",
+        maxAge: -1,
+        httpOnly: true,
+      });
     });
   });
 });
