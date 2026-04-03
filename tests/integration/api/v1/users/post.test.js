@@ -37,6 +37,7 @@ describe("[POST] /api/v1/users", () => {
         username: "john.doe",
         email: "john.doe@example.com",
         password: body.password,
+        features: [],
         created_at: body.created_at,
         updated_at: body.updated_at,
       });
