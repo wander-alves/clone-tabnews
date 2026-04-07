@@ -1,4 +1,5 @@
-import orchestrator from "tests/orchestrator";
+import activation from "models/activation";
+import orchestrator from "tests/orchestrator.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -7,7 +8,8 @@ beforeAll(async () => {
   await orchestrator.deleteAllEmails();
 });
 
-describe("Use case: Registration Flow (all sucessful", () => {
+describe("Use case: Registration Flow (all sucessful)", () => {
+  let body;
   test("Create user account", async () => {
     const response = await fetch("http://localhost:3000/api/v1/users", {
       method: "POST",
@@ -21,7 +23,7 @@ describe("Use case: Registration Flow (all sucessful", () => {
       }),
     });
 
-    const body = await response.json();
+    body = await response.json();
 
     expect(response.status).toBe(201);
     expect(body).toEqual({
@@ -35,7 +37,17 @@ describe("Use case: Registration Flow (all sucessful", () => {
     });
   });
 
-  test("Receive activation email", async () => {});
+  test("Receive activation email", async () => {
+    const lastEmail = await orchestrator.getLastEmail();
+    const activationToken = await activation.getOneByUserId(body.id);
+
+    expect(lastEmail.sender).toEqual("<activation@example.local>");
+    expect(lastEmail.recipients[0]).toEqual("<registration.flow@example.com>");
+    expect(lastEmail.subject).toEqual("Activate your account");
+    expect(lastEmail.text).toContain("RegistrationFlow");
+    expect(lastEmail.text).toContain(activationToken.id);
+  });
+
   test("Activate account", async () => {});
   test("Login", async () => {});
   test("Get user information", async () => {});
