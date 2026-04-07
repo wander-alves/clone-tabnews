@@ -1,8 +1,9 @@
 import { randomBytes } from "node:crypto";
 import database from "infra/database";
 import { UnauthorizedError } from "infra/errors";
+import dateConverter from "utils/date-converter.js";
 
-const EXPIRATION_IN_MILLISECONDS = getDayInMilliseconds(30);
+const EXPIRATION_IN_MILLISECONDS = dateConverter.getDayInMilliseconds(30);
 
 async function create(userId) {
   const token = randomBytes(48).toString("hex");
@@ -112,24 +113,12 @@ async function findOneByValidToken(sessionToken) {
   }
 }
 
-function getDayInMilliseconds(dayAmount) {
-  const secondInMs = 1000;
-  const minuteInSecs = 60;
-  const hourInMins = 60;
-  const dayInHrs = 24;
-
-  const result = secondInMs * minuteInSecs * hourInMins * dayInHrs * dayAmount;
-
-  return result;
-}
-
 const session = {
   create,
   findOneByValidToken,
   renew,
   revokeById,
   EXPIRATION_IN_MILLISECONDS,
-  getDayInMilliseconds,
 };
 
 export default session;

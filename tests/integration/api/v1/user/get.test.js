@@ -3,6 +3,7 @@ import setCookieParser from "set-cookie-parser";
 
 import orchestrator from "tests/orchestrator.js";
 import session from "models/session.js";
+import dateConverter from "utils/date-converter.js";
 
 async function cleanDatabase() {
   await orchestrator.waitForAllServices();
@@ -67,7 +68,7 @@ describe("[GET] /api/v1/user", () => {
 
     test("it should be able to get user info even if session is about to expire", async () => {
       const customExpirationDateInMilliseconds =
-        session.getDayInMilliseconds(28);
+        dateConverter.getDayInMilliseconds(28);
 
       const dateNearToExpiresFromNow = new Date(
         Date.now() - customExpirationDateInMilliseconds,
