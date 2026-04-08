@@ -39,13 +39,17 @@ describe("Use case: Registration Flow (all sucessful)", () => {
 
   test("Receive activation email", async () => {
     const lastEmail = await orchestrator.getLastEmail();
-    const activationToken = await activation.getOneByUserId(body.id);
 
     expect(lastEmail.sender).toEqual("<activation@example.local>");
     expect(lastEmail.recipients[0]).toEqual("<registration.flow@example.com>");
     expect(lastEmail.subject).toEqual("Activate your account");
     expect(lastEmail.text).toContain("RegistrationFlow");
-    expect(lastEmail.text).toContain(activationToken.id);
+
+    const tokenId = orchestrator.extractUUIDFromText(lastEmail.text);
+    const activationToken = await activation.findOneByValidToken(tokenId);
+
+    expect(activationToken.user_id).toBe(body.id);
+    expect(activationToken.used_at).toBe(null);
   });
 
   test("Activate account", async () => {});

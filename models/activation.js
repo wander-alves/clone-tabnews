@@ -2,6 +2,7 @@ import email from "infra/email.js";
 import database from "infra/database.js";
 import dateConverter from "utils/date-converter";
 import webserver from "infra/webserver.js";
+import { UnauthorizedError } from "infra/errors";
 
 async function create(userId) {
   const EXPIRATION_IN_MILLISECONDS = dateConverter.getMinutesInMilliseconds(15);
@@ -26,22 +27,33 @@ async function create(userId) {
   }
 }
 
-async function getOneByUserId(userId) {
-  const activationToken = await runSelectQuery(userId);
+async function findOneByValidToken(tokenId) {
+  const activationToken = await runSelectQuery(tokenId);
   return activationToken;
 
-  async function runSelectQuery(userId) {
+  async function runSelectQuery(tokenId) {
     const result = await database.query({
       text: `
-        SELECT
+        SELECT 
           *
-        FROM
+        FROM 
           user_activation_tokens
         WHERE
-          user_id=$1
+          id=$1
+          AND expires_at > NOW()
+          AND used_at IS NULL
+        LIMIT
+          1
       ;`,
-      values: [userId],
+      values: [tokenId],
     });
+
+    if (result.rows == 0) {
+      throw new UnauthorizedError({
+        message: "O token de ativação não foi localizado ou está expirado.",
+        action: "É necessário refazer o processo de cadastro.",
+      });
+    }
 
     return result.rows[0];
   }
@@ -68,7 +80,7 @@ Support Example Local Inc.
 const activation = {
   sendEmailToUser,
   create,
-  getOneByUserId,
+  findOneByValidToken,
 };
 
 export default activation;
