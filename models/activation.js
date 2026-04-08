@@ -1,8 +1,9 @@
 import email from "infra/email.js";
 import database from "infra/database.js";
-import dateConverter from "utils/date-converter";
 import webserver from "infra/webserver.js";
-import { UnauthorizedError } from "infra/errors";
+import user from "models/user.js";
+import dateConverter from "utils/date-converter.js";
+import { UnauthorizedError } from "infra/errors.js";
 
 async function create(userId) {
   const EXPIRATION_IN_MILLISECONDS = dateConverter.getMinutesInMilliseconds(15);
@@ -23,6 +24,30 @@ async function create(userId) {
       ;`,
       values: [userId, expiresAt],
     });
+    return result.rows[0];
+  }
+}
+
+async function markTokenAsUsed(tokenId) {
+  const updatedToken = await runUpdateQuery(tokenId);
+  return updatedToken;
+
+  async function runUpdateQuery(tokenId) {
+    const result = await database.query({
+      text: `
+        UPDATE
+          user_activation_tokens
+        SET
+          used_at = timezone('utc', now()),
+          updated_at = timezone('utc', now())
+        WHERE
+          id=$1
+        RETURNING
+          *
+      ;`,
+      values: [tokenId],
+    });
+
     return result.rows[0];
   }
 }
@@ -59,6 +84,11 @@ async function findOneByValidToken(tokenId) {
   }
 }
 
+async function activateUserByUserId(userId) {
+  const activatedUser = await user.setFeatures(userId, ["create:session"]);
+  return activatedUser;
+}
+
 async function sendEmailToUser(user, activationToken) {
   await email.send({
     from: "Account Activation <activation@example.local>",
@@ -81,6 +111,8 @@ const activation = {
   sendEmailToUser,
   create,
   findOneByValidToken,
+  markTokenAsUsed,
+  activateUserByUserId,
 };
 
 export default activation;
