@@ -8,7 +8,8 @@ const router = createRouter();
 
 export default router.handler(controller.errorHandlers);
 
-router.post(postHandler);
+router.use(controller.injectAnonymousOrUser);
+router.post(controller.canRequest("create:session"), postHandler);
 router.delete(deleteHandler);
 
 async function postHandler(request, response) {

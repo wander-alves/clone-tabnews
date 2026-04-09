@@ -102,6 +102,27 @@ class UnauthorizedError extends Error {
   }
 }
 
+class ForbiddenError extends Error {
+  constructor({ cause, message, action }) {
+    super(message || "Acesso negado.", {
+      cause,
+    });
+    this.name = "ForbiddenError";
+    this.action =
+      action || "Verifique as features necessárias e tente novamente.";
+    this.statusCode = 403;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.statusCode,
+    };
+  }
+}
+
 class MethodNotAllowedError extends Error {
   constructor() {
     super("O método utilizado não é suportado pelo endpoint.");
@@ -127,4 +148,5 @@ export {
   ValidationError,
   NotFoundError,
   UnauthorizedError,
+  ForbiddenError,
 };
