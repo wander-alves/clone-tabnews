@@ -104,6 +104,8 @@ describe("[POST] /api/v1/sessions", () => {
         password: "correctpassword",
       });
 
+      await orchestrator.activateUser(storedUser.id);
+
       const response = await fetch("http://localhost:3000/api/v1/sessions", {
         method: "POST",
         headers: {

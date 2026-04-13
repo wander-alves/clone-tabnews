@@ -9,6 +9,7 @@ import {
   ValidationError,
 } from "./errors.js";
 import session from "models/session.js";
+import authorization from "models/authorization.js";
 import user from "models/user.js";
 
 function onNoMatchHandler(request, response) {
@@ -64,7 +65,8 @@ function clearSessionCookie(response) {
 function canRequest(feature) {
   return function (request, _response, next) {
     const currentUser = request.context.user;
-    if (currentUser.features.includes(feature)) {
+
+    if (authorization.can(currentUser, feature)) {
       return next();
     }
 
