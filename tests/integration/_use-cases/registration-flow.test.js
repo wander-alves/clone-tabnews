@@ -69,7 +69,10 @@ describe("Use case: Registration Flow (all sucessful)", () => {
     expect(Date.parse(responseBody.used_at)).not.toBeNaN();
 
     const activatedAccount = await user.findOneByUsername("RegistrationFlow");
-    expect(activatedAccount.features).toEqual(["create:session"]);
+
+    expect(activatedAccount.features).toEqual(
+      expect.arrayContaining(["create:session"]),
+    );
   });
 
   test("Login", async () => {
@@ -85,7 +88,22 @@ describe("Use case: Registration Flow (all sucessful)", () => {
     });
 
     expect(response.status).toBe(201);
+
+    const requestLoginBody = await response.json();
+    expect(requestLoginBody.user_id).toEqual(body.id);
   });
 
-  test("Get user information", async () => {});
+  test("Get user information", async () => {
+    const createdSession = await orchestrator.createSession(body.id);
+
+    const response = await fetch("http://localhost:3000/api/v1/user", {
+      headers: {
+        Cookie: `session_id=${createdSession.token}`,
+      },
+    });
+
+    const requestUserSessionBody = await response.json();
+    expect(response.status).toBe(200);
+    expect(requestUserSessionBody.id).toEqual(body.id);
+  });
 });

@@ -16,6 +16,22 @@ beforeAll(async () => {
 });
 
 describe("[GET] /api/v1/user", () => {
+  describe("Anonymous user", () => {
+    test("it should not be able to get user info without a session", async () => {
+      const response = await fetch("http://localhost:3000/api/v1/user/");
+
+      expect(response.status).toBe(403);
+
+      const body = await response.json();
+      expect(body).toEqual({
+        name: "ForbiddenError",
+        message: "O usuário não possui permissão para executar esta ação.",
+        action: `Verifique se seu usuário possui a feature: "read:session"`,
+        status_code: 403,
+      });
+    });
+  });
+
   describe("Generic user", () => {
     test("it should be able to get user info with valid session", async () => {
       const createdUser = await orchestrator.createUser({
@@ -23,6 +39,10 @@ describe("[GET] /api/v1/user", () => {
       });
 
       const createdSession = await orchestrator.createSession(createdUser.id);
+
+      const updatedUser = await orchestrator.activateUserByUserId(
+        createdUser.id,
+      );
 
       const response = await fetch("http://localhost:3000/api/v1/user/", {
         headers: {
@@ -34,17 +54,17 @@ describe("[GET] /api/v1/user", () => {
 
       expect(response.status).toBe(200);
       expect(body).toEqual({
-        id: createdUser.id,
+        id: updatedUser.id,
         username: "ValidSessionUser",
-        email: createdUser.email,
-        password: createdUser.password,
-        features: ["read:activation_token"],
-        created_at: createdUser.created_at.toISOString(),
-        updated_at: createdUser.updated_at.toISOString(),
+        email: updatedUser.email,
+        password: updatedUser.password,
+        features: ["create:session", "read:session"],
+        created_at: updatedUser.created_at.toISOString(),
+        updated_at: updatedUser.updated_at.toISOString(),
       });
-      expect(uuidVersion(createdUser.id)).toBe(4);
-      expect(Date.parse(createdUser.created_at)).not.toBeNaN();
-      expect(Date.parse(createdUser.updated_at)).not.toBeNaN();
+      expect(uuidVersion(updatedUser.id)).toBe(4);
+      expect(Date.parse(updatedUser.created_at)).not.toBeNaN();
+      expect(Date.parse(updatedUser.updated_at)).not.toBeNaN();
 
       const renewedSession = await session.findOneByValidToken(
         createdSession.token,
@@ -84,6 +104,10 @@ describe("[GET] /api/v1/user", () => {
 
       const createdSession = await orchestrator.createSession(createdUser.id);
 
+      const updatedUser = await orchestrator.activateUserByUserId(
+        createdUser.id,
+      );
+
       jest.useRealTimers();
 
       const response = await fetch("http://localhost:3000/api/v1/user/", {
@@ -105,9 +129,9 @@ describe("[GET] /api/v1/user", () => {
         username: "UserWithTokenNearToExpire",
         email: createdUser.email,
         password: createdUser.password,
-        features: ["read:activation_token"],
+        features: ["create:session", "read:session"],
         created_at: createdUser.created_at.toISOString(),
-        updated_at: createdUser.updated_at.toISOString(),
+        updated_at: updatedUser.updated_at.toISOString(),
       });
       expect(uuidVersion(createdUser.id)).toBe(4);
       expect(Date.parse(createdUser.created_at)).not.toBeNaN();

@@ -8,7 +8,8 @@ const router = createRouter();
 
 export default router.handler(controller.errorHandlers);
 
-router.get(getHandler);
+router.use(controller.injectAnonymousOrUser);
+router.get(controller.canRequest("read:session"), getHandler);
 
 async function getHandler(request, response) {
   const sessionToken = request.cookies.session_id;
