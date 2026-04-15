@@ -3,10 +3,11 @@ import database from "infra/database.js";
 import webserver from "infra/webserver.js";
 import user from "models/user.js";
 import dateConverter from "utils/date-converter.js";
-import { UnauthorizedError } from "infra/errors.js";
+import { ForbiddenError, NotFoundError } from "infra/errors.js";
+import authorization from "./authorization";
 
+const EXPIRATION_IN_MILLISECONDS = dateConverter.getMinutesInMilliseconds(15);
 async function create(userId) {
-  const EXPIRATION_IN_MILLISECONDS = dateConverter.getMinutesInMilliseconds(15);
   const expiresAt = new Date(Date.now() + EXPIRATION_IN_MILLISECONDS);
   const activationToken = await runInsertQuery(userId, expiresAt);
 
@@ -74,7 +75,7 @@ async function findOneByValidToken(tokenId) {
     });
 
     if (result.rows == 0) {
-      throw new UnauthorizedError({
+      throw new NotFoundError({
         message: "O token de ativação não foi localizado ou está expirado.",
         action: "É necessário refazer o processo de cadastro.",
       });
@@ -85,6 +86,15 @@ async function findOneByValidToken(tokenId) {
 }
 
 async function activateUserByUserId(userId) {
+  const inactiveUser = await user.findOneById(userId);
+
+  if (!authorization.can(inactiveUser, "read:activation_token")) {
+    throw new ForbiddenError({
+      message: "A ativação desse usuário não foi permitida",
+      action: "Entre em contato com o suporte.",
+    });
+  }
+
   const activatedUser = await user.setFeatures(userId, [
     "create:session",
     "read:session",
@@ -116,6 +126,7 @@ const activation = {
   findOneByValidToken,
   markTokenAsUsed,
   activateUserByUserId,
+  EXPIRATION_IN_MILLISECONDS,
 };
 
 export default activation;
