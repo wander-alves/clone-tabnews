@@ -7,7 +7,8 @@ const router = createRouter();
 
 export default router.handler(controller.errorHandlers);
 
-router.post(postHandler);
+router.use(controller.injectAnonymousOrUser);
+router.post(controller.canRequest("create:user"), postHandler);
 
 async function postHandler(request, response) {
   const userInputValues = request.body;
