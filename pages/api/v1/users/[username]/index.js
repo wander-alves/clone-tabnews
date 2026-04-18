@@ -6,8 +6,9 @@ const router = createRouter();
 
 export default router.handler(controller.errorHandlers);
 
+router.use(controller.injectAnonymousOrUser);
 router.get(getHandler);
-router.patch(patchHandler);
+router.patch(controller.canRequest("update:user"), patchHandler);
 
 async function getHandler(request, response) {
   const username = request.query.username;
