@@ -74,15 +74,15 @@ describe("[PATCH] /api/v1/users/[username]", () => {
     });
 
     test("it should not be able to change to a duplicated username", async () => {
-      const user1 = await orchestrator.createUser({
+      await orchestrator.createUser({
         username: "user1",
       });
-      await orchestrator.activateUserByUserId(user1.id);
-      const sessionObject = await orchestrator.createSession(user1.id);
 
       const user2 = await orchestrator.createUser({
         username: "user2",
       });
+      await orchestrator.activateUserByUserId(user2.id);
+      const sessionObject = await orchestrator.createSession(user2.id);
 
       const response = await fetch(
         `http://localhost:3000/api/v1/users/${user2.username}`,
@@ -110,15 +110,15 @@ describe("[PATCH] /api/v1/users/[username]", () => {
     });
 
     test("it should not be able to change to a duplicated email", async () => {
-      const createdUser1 = await orchestrator.createUser({
+      await orchestrator.createUser({
         email: "email1@example.com",
       });
-      await orchestrator.activateUserByUserId(createdUser1.id);
-      const sessionObject = await orchestrator.createSession(createdUser1.id);
 
       const createdUser2 = await orchestrator.createUser({
         email: "email2@example.com",
       });
+      await orchestrator.activateUserByUserId(createdUser2.id);
+      const sessionObject = await orchestrator.createSession(createdUser2.id);
 
       const response = await fetch(
         `http://localhost:3000/api/v1/users/${createdUser2.username}`,
@@ -142,6 +142,42 @@ describe("[PATCH] /api/v1/users/[username]", () => {
         message: "O e-mail informado já está registrado.",
         action: "Utilize outro endereço de e-mail para realizar esta operação.",
         status_code: 400,
+      });
+    });
+
+    test("it should not be able to change an user from different account", async () => {
+      const userA = await orchestrator.createUser({
+        username: "userA",
+      });
+      const userB = await orchestrator.createUser({
+        username: "userB",
+      });
+      await orchestrator.activateUserByUserId(userB.id);
+      const sessionObject = await orchestrator.createSession(userB.id);
+
+      const response = await fetch(
+        `http://localhost:3000/api/v1/users/${userA.username}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObject.token}`,
+          },
+          body: JSON.stringify({
+            username: "userC",
+          }),
+        },
+      );
+
+      expect(response.status).toBe(403);
+
+      const body = await response.json();
+      expect(body).toEqual({
+        name: "ForbiddenError",
+        message: "Sua conta não possui permissão para atualizar outro usuário.",
+        action:
+          "Verifique se sua conta possui a feature necessária para atualizar outro usuário",
+        status_code: 403,
       });
     });
 
