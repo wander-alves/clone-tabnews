@@ -22,8 +22,8 @@ describe("[GET] /api/v1/user", () => {
 
       expect(response.status).toBe(403);
 
-      const body = await response.json();
-      expect(body).toEqual({
+      const responseBody = await response.json();
+      expect(responseBody).toEqual({
         name: "ForbiddenError",
         message: "O usuário não possui permissão para executar esta ação.",
         action: `Verifique se seu usuário possui a feature: "read:session"`,
@@ -50,14 +50,14 @@ describe("[GET] /api/v1/user", () => {
         },
       });
 
-      const body = await response.json();
-
       expect(response.status).toBe(200);
-      expect(body).toEqual({
+
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
         id: updatedUser.id,
         username: "ValidSessionUser",
         email: updatedUser.email,
-        password: updatedUser.password,
         features: ["create:session", "read:session", "update:user"],
         created_at: updatedUser.created_at.toISOString(),
         updated_at: updatedUser.updated_at.toISOString(),
@@ -116,19 +116,19 @@ describe("[GET] /api/v1/user", () => {
         },
       });
 
-      const body = await response.json();
+      expect(response.status).toBe(200);
+
+      const responseBody = await response.json();
       const cacheControl = response.headers.get("Cache-Control");
 
-      expect(response.status).toBe(200);
       expect(cacheControl).toEqual(
         "no-store, no-cache, max-age=0, must-revalidate",
       );
 
-      expect(body).toEqual({
+      expect(responseBody).toEqual({
         id: createdUser.id,
         username: "UserWithTokenNearToExpire",
         email: createdUser.email,
-        password: createdUser.password,
         features: ["create:session", "read:session", "update:user"],
         created_at: createdUser.created_at.toISOString(),
         updated_at: updatedUser.updated_at.toISOString(),
@@ -165,9 +165,9 @@ describe("[GET] /api/v1/user", () => {
         },
       });
 
-      const body = await response.json();
+      const responseBody = await response.json();
 
-      expect(body).toEqual({
+      expect(responseBody).toEqual({
         name: "UnauthorizedError",
         message: "O usuário não possui sessão ativa.",
         action: "Verifique se o usuário está autenticado e tente novamente.",
@@ -196,8 +196,9 @@ describe("[GET] /api/v1/user", () => {
 
       expect(response.status).toBe(401);
 
-      const body = await response.json();
-      expect(body).toEqual({
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
         name: "UnauthorizedError",
         message: "O usuário não possui sessão ativa.",
         action: "Verifique se o usuário está autenticado e tente novamente.",

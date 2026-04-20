@@ -11,7 +11,7 @@ beforeAll(async () => {
 });
 
 describe("Use case: Registration Flow (all sucessful)", () => {
-  let body;
+  let responseBody;
   let tokenId;
   test("Create user account", async () => {
     const response = await fetch("http://localhost:3000/api/v1/users", {
@@ -26,17 +26,15 @@ describe("Use case: Registration Flow (all sucessful)", () => {
       }),
     });
 
-    body = await response.json();
+    responseBody = await response.json();
 
     expect(response.status).toBe(201);
-    expect(body).toEqual({
-      id: body.id,
+    expect(responseBody).toEqual({
+      id: responseBody.id,
       username: "RegistrationFlow",
-      email: "registration.flow@example.com",
-      password: body.password,
       features: ["read:activation_token"],
-      created_at: body.created_at,
-      updated_at: body.updated_at,
+      created_at: responseBody.created_at,
+      updated_at: responseBody.updated_at,
     });
   });
 
@@ -51,7 +49,7 @@ describe("Use case: Registration Flow (all sucessful)", () => {
     tokenId = orchestrator.extractUUIDFromText(lastEmail.text);
     const activationToken = await activation.findOneByValidToken(tokenId);
 
-    expect(activationToken.user_id).toBe(body.id);
+    expect(activationToken.user_id).toBe(responseBody.id);
     expect(activationToken.used_at).toBe(null);
   });
 
@@ -92,11 +90,11 @@ describe("Use case: Registration Flow (all sucessful)", () => {
     expect(response.status).toBe(201);
 
     const requestLoginBody = await response.json();
-    expect(requestLoginBody.user_id).toEqual(body.id);
+    expect(requestLoginBody.user_id).toEqual(responseBody.id);
   });
 
   test("Get user information", async () => {
-    const createdSession = await orchestrator.createSession(body.id);
+    const createdSession = await orchestrator.createSession(responseBody.id);
 
     const response = await fetch("http://localhost:3000/api/v1/user", {
       headers: {
@@ -106,6 +104,6 @@ describe("Use case: Registration Flow (all sucessful)", () => {
 
     const requestUserSessionBody = await response.json();
     expect(response.status).toBe(200);
-    expect(requestUserSessionBody.id).toEqual(body.id);
+    expect(requestUserSessionBody.id).toEqual(responseBody.id);
   });
 });

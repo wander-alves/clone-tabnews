@@ -2,7 +2,7 @@ import { version as uuidVersion } from "uuid";
 
 import activation from "models/activation";
 import orchestrator from "tests/orchestrator.js";
-import user from "models/user";
+import user from "models/user.js";
 
 async function cleanDatabase() {
   await orchestrator.waitForAllServices();
@@ -26,8 +26,9 @@ describe("[PATCH] /api/v1/activations/[token_id]", () => {
 
       expect(response.status).toBe(404);
 
-      const body = await response.json();
-      expect(body).toEqual({
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
         name: "NotFoundError",
         message: "O token de ativação não foi localizado ou está expirado.",
         action: "É necessário refazer o processo de cadastro.",
@@ -54,8 +55,9 @@ describe("[PATCH] /api/v1/activations/[token_id]", () => {
 
       expect(response.status).toBe(404);
 
-      const body = await response.json();
-      expect(body).toEqual({
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
         name: "NotFoundError",
         message: "O token de ativação não foi localizado ou está expirado.",
         action: "É necessário refazer o processo de cadastro.",
@@ -83,10 +85,11 @@ describe("[PATCH] /api/v1/activations/[token_id]", () => {
         },
       );
 
-      const body = await response.json();
-
       expect(response.status).toBe(404);
-      expect(body).toEqual({
+
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
         name: "NotFoundError",
         message: "O token de ativação não foi localizado ou está expirado.",
         action: "É necessário refazer o processo de cadastro.",
@@ -107,25 +110,25 @@ describe("[PATCH] /api/v1/activations/[token_id]", () => {
 
       expect(response.status).toBe(200);
 
-      const body = await response.json();
+      const responseBody = await response.json();
 
-      expect(body).toEqual({
-        id: body.id,
-        used_at: body.used_at,
-        user_id: body.user_id,
-        expires_at: body.expires_at,
-        created_at: body.created_at,
-        updated_at: body.updated_at,
+      expect(responseBody).toEqual({
+        id: responseBody.id,
+        used_at: responseBody.used_at,
+        user_id: responseBody.user_id,
+        expires_at: responseBody.expires_at,
+        created_at: responseBody.created_at,
+        updated_at: responseBody.updated_at,
       });
 
-      expect(uuidVersion(body.id)).toBe(4);
-      expect(Date.parse(body.used_at)).not.toBeNaN();
-      expect(Date.parse(body.expires_at)).not.toBeNaN();
-      expect(Date.parse(body.updated_at)).not.toBeNaN();
-      expect(Date.parse(body.updated_at)).not.toBeNaN();
+      expect(uuidVersion(responseBody.id)).toBe(4);
+      expect(Date.parse(responseBody.used_at)).not.toBeNaN();
+      expect(Date.parse(responseBody.expires_at)).not.toBeNaN();
+      expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
+      expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
 
-      const expiresAt = new Date(body.expires_at);
-      const createdAt = new Date(body.created_at);
+      const expiresAt = new Date(responseBody.expires_at);
+      const createdAt = new Date(responseBody.created_at);
 
       expiresAt.setMilliseconds(0);
       createdAt.setMilliseconds(0);
@@ -134,7 +137,7 @@ describe("[PATCH] /api/v1/activations/[token_id]", () => {
         activation.EXPIRATION_IN_MILLISECONDS,
       );
 
-      const activatedUser = await user.findOneById(body.user_id);
+      const activatedUser = await user.findOneById(responseBody.user_id);
       expect(activatedUser.features).toEqual([
         "create:session",
         "read:session",
@@ -164,9 +167,9 @@ describe("[PATCH] /api/v1/activations/[token_id]", () => {
 
       expect(response.status).toBe(403);
 
-      const body = await response.json();
+      const responseBody = await response.json();
 
-      expect(body).toEqual({
+      expect(responseBody).toEqual({
         name: "ForbiddenError",
         message: "O usuário não possui permissão para executar esta ação.",
         action: `Verifique se seu usuário possui a feature: "read:activation_token"`,

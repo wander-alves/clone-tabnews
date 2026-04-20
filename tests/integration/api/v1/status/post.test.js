@@ -13,8 +13,8 @@ describe("[POST] /api/v1/status", () => {
 
       expect(response.status).toBe(405);
 
-      const body = await response.json();
-      expect(body).toEqual({
+      const responseBody = await response.json();
+      expect(responseBody).toEqual({
         name: "MethodNotAllowedError",
         message: "O método utilizado não é suportado pelo endpoint.",
         action: "Verifique se o método HTTP é permitido para o endpoint.",

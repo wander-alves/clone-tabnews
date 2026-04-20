@@ -32,8 +32,9 @@ describe("[PATCH] /api/v1/users/[username]", () => {
 
       expect(response.status).toBe(403);
 
-      const body = await response.json();
-      expect(body).toEqual({
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
         name: "ForbiddenError",
         action: `Verifique se seu usuário possui a feature: "update:user"`,
         message: "O usuário não possui permissão para executar esta ação.",
@@ -64,8 +65,9 @@ describe("[PATCH] /api/v1/users/[username]", () => {
 
       expect(response.status).toBe(404);
 
-      const body = await response.json();
-      expect(body).toEqual({
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
         name: "NotFoundError",
         message: "Não foi possível localizar o usuário informado.",
         action: "Verifique o username informado e tente novamente.",
@@ -100,8 +102,9 @@ describe("[PATCH] /api/v1/users/[username]", () => {
 
       expect(response.status).toBe(400);
 
-      const body = await response.json();
-      expect(body).toEqual({
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
         name: "ValidationError",
         message: "O username informado já está registrado.",
         action: "Utilize outro nome de usuário para realizar esta operação.",
@@ -136,8 +139,9 @@ describe("[PATCH] /api/v1/users/[username]", () => {
 
       expect(response.status).toBe(400);
 
-      const body = await response.json();
-      expect(body).toEqual({
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
         name: "ValidationError",
         message: "O e-mail informado já está registrado.",
         action: "Utilize outro endereço de e-mail para realizar esta operação.",
@@ -171,8 +175,9 @@ describe("[PATCH] /api/v1/users/[username]", () => {
 
       expect(response.status).toBe(403);
 
-      const body = await response.json();
-      expect(body).toEqual({
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
         name: "ForbiddenError",
         message: "Sua conta não possui permissão para atualizar outro usuário.",
         action:
@@ -204,22 +209,20 @@ describe("[PATCH] /api/v1/users/[username]", () => {
 
       expect(response.status).toBe(200);
 
-      const body = await response.json();
+      const responseBody = await response.json();
 
-      expect(body).toEqual({
+      expect(responseBody).toEqual({
         id: createdUser.id,
         username: "updatedUsername",
-        email: createdUser.email,
-        password: createdUser.password,
         features: ["create:session", "read:session", "update:user"],
-        created_at: body.created_at,
-        updated_at: body.updated_at,
+        created_at: responseBody.created_at,
+        updated_at: responseBody.updated_at,
       });
-      expect(uuidVersion(body.id)).toBe(4);
-      expect(Date.parse(body.created_at)).not.toBeNaN();
-      expect(Date.parse(body.updated_at)).not.toBeNaN();
+      expect(uuidVersion(responseBody.id)).toBe(4);
+      expect(Date.parse(responseBody.created_at)).not.toBeNaN();
+      expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
 
-      expect(body.updated_at > body.created_at).toBe(true);
+      expect(responseBody.updated_at > responseBody.created_at).toBe(true);
     });
 
     test("it should be able to change an email", async () => {
@@ -245,22 +248,23 @@ describe("[PATCH] /api/v1/users/[username]", () => {
 
       expect(response.status).toBe(200);
 
-      const body = await response.json();
+      const responseBody = await response.json();
 
-      expect(body).toEqual({
+      expect(responseBody).toEqual({
         id: createdUser.id,
         username: createdUser.username,
-        email: "updatedEmail@example.com",
-        password: createdUser.password,
         features: ["create:session", "read:session", "update:user"],
-        created_at: body.created_at,
-        updated_at: body.updated_at,
+        created_at: responseBody.created_at,
+        updated_at: responseBody.updated_at,
       });
-      expect(uuidVersion(body.id)).toBe(4);
-      expect(Date.parse(body.created_at)).not.toBeNaN();
-      expect(Date.parse(body.updated_at)).not.toBeNaN();
+      expect(uuidVersion(responseBody.id)).toBe(4);
+      expect(Date.parse(responseBody.created_at)).not.toBeNaN();
+      expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
 
-      expect(body.updated_at > body.created_at).toBe(true);
+      expect(responseBody.updated_at > responseBody.created_at).toBe(true);
+
+      const updatedUser = await user.findOneById(responseBody.id);
+      expect(updatedUser.email).toEqual("updatedEmail@example.com");
     });
 
     test("it should be able to change the password", async () => {
@@ -286,24 +290,24 @@ describe("[PATCH] /api/v1/users/[username]", () => {
 
       expect(response.status).toBe(200);
 
-      const body = await response.json();
+      const responseBody = await response.json();
 
-      expect(body).toEqual({
+      expect(responseBody).toEqual({
         id: createdUser.id,
         username: createdUser.username,
-        email: createdUser.email,
-        password: body.password,
         features: ["create:session", "read:session", "update:user"],
-        created_at: body.created_at,
-        updated_at: body.updated_at,
+        created_at: responseBody.created_at,
+        updated_at: responseBody.updated_at,
       });
-      expect(uuidVersion(body.id)).toBe(4);
-      expect(Date.parse(body.created_at)).not.toBeNaN();
-      expect(Date.parse(body.updated_at)).not.toBeNaN();
+      expect(uuidVersion(responseBody.id)).toBe(4);
+      expect(Date.parse(responseBody.created_at)).not.toBeNaN();
+      expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
 
-      expect(body.updated_at > body.created_at).toBe(true);
+      expect(responseBody.updated_at > responseBody.created_at).toBe(true);
 
-      const userInDatabase = await user.findOneByUsername(body.username);
+      const userInDatabase = await user.findOneByUsername(
+        responseBody.username,
+      );
       const correctPasswordMatch = await password.compare(
         "newPassword",
         userInDatabase.password,
@@ -348,22 +352,20 @@ describe("[PATCH] /api/v1/users/[username]", () => {
 
       expect(response.status).toBe(200);
 
-      const body = await response.json();
+      const responseBody = await response.json();
 
-      expect(body).toEqual({
+      expect(responseBody).toEqual({
         id: defaultUser.id,
         username: "UpdatedByPrivilegedUser",
-        email: defaultUser.email,
-        password: body.password,
         features: defaultUser.features,
-        created_at: body.created_at,
-        updated_at: body.updated_at,
+        created_at: responseBody.created_at,
+        updated_at: responseBody.updated_at,
       });
-      expect(uuidVersion(body.id)).toBe(4);
-      expect(Date.parse(body.created_at)).not.toBeNaN();
-      expect(Date.parse(body.updated_at)).not.toBeNaN();
+      expect(uuidVersion(responseBody.id)).toBe(4);
+      expect(Date.parse(responseBody.created_at)).not.toBeNaN();
+      expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
 
-      expect(body.updated_at > body.created_at).toBe(true);
+      expect(responseBody.updated_at > responseBody.created_at).toBe(true);
     });
   });
 });
