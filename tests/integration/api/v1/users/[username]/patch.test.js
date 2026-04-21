@@ -75,7 +75,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       });
     });
 
-    test("it should not be able to change to a duplicated username", async () => {
+    test("it should not be able to change to a duplicated `username`", async () => {
       await orchestrator.createUser({
         username: "user1",
       });
@@ -186,7 +186,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       });
     });
 
-    test("it should be able to change an username", async () => {
+    test("it should be able to change an `username`", async () => {
       const createdUser = await orchestrator.createUser({
         username: "originalUsername",
       });
@@ -225,7 +225,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       expect(responseBody.updated_at > responseBody.created_at).toBe(true);
     });
 
-    test("it should be able to change an email", async () => {
+    test("it should be able to change an `email`", async () => {
       const createdUser = await orchestrator.createUser({
         email: "orginalEmail@example.com",
       });
@@ -267,7 +267,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       expect(updatedUser.email).toEqual("updatedEmail@example.com");
     });
 
-    test("it should be able to change the password", async () => {
+    test("it should be able to change the `password`", async () => {
       const createdUser = await orchestrator.createUser({
         password: "oldPassword",
       });
@@ -324,7 +324,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
   });
 
   describe("Privileged user", () => {
-    test('it should be able to change another user with "update:user:others" feature', async () => {
+    test("it should be able to change another user with `update:user:others` `feature`", async () => {
       const privilegedUser = await orchestrator.createUser();
       await orchestrator.activateUserByUserId(privilegedUser.id);
       await orchestrator.addFeaturesToUser(privilegedUser.id, [

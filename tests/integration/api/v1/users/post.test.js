@@ -61,7 +61,7 @@ describe("[POST] /api/v1/users", () => {
       expect(incorrectPasswordMatch).toBe(false);
     });
 
-    test("it should not be able to register a duplicated username", async () => {
+    test("it should not be able to register a duplicated `username`", async () => {
       const createdUser = await orchestrator.createUser();
 
       const response = await fetch("http://localhost:3000/api/v1/users", {
@@ -88,7 +88,7 @@ describe("[POST] /api/v1/users", () => {
       });
     });
 
-    test("it should not be able to register a duplicated e-mail", async () => {
+    test("it should not be able to register a duplicated `email`", async () => {
       const createdUser = await orchestrator.createUser();
 
       const response = await fetch("http://localhost:3000/api/v1/users", {
