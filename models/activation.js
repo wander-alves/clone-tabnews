@@ -105,7 +105,7 @@ async function activateUserByUserId(userId) {
 
 async function sendEmailToUser(user, activationToken) {
   await email.send({
-    from: "Account Activation <activation@example.local>",
+    from: "Account Activation <activation@wandersonalves.com.br>",
     to: user.email,
     subject: "Activate your account",
     text: `Hi, @${user.username}!
