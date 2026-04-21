@@ -2,7 +2,7 @@ import { version as uuidVersion } from "uuid";
 import setCookieParser from "set-cookie-parser";
 
 import orchestrator from "tests/orchestrator.js";
-import session from "models/session";
+import session from "models/session.js";
 
 async function cleanDatabase() {
   await orchestrator.waitForAllServices();

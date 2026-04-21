@@ -29,22 +29,24 @@ describe("[POST] /api/v1/users", () => {
         }),
       });
 
-      const body = await response.json();
-
       expect(response.status).toBe(201);
-      expect(body).toEqual({
-        id: body.id,
-        username: "john.doe",
-        email: "john.doe@example.com",
-        password: body.password,
-        created_at: body.created_at,
-        updated_at: body.updated_at,
-      });
-      expect(uuidVersion(body.id)).toBe(4);
-      expect(Date.parse(body.created_at)).not.toBeNaN();
-      expect(Date.parse(body.updated_at)).not.toBeNaN();
 
-      const userInDatabase = await user.findOneByUsername(body.username);
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
+        id: responseBody.id,
+        username: "john.doe",
+        features: ["read:activation_token"],
+        created_at: responseBody.created_at,
+        updated_at: responseBody.updated_at,
+      });
+      expect(uuidVersion(responseBody.id)).toBe(4);
+      expect(Date.parse(responseBody.created_at)).not.toBeNaN();
+      expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
+
+      const userInDatabase = await user.findOneByUsername(
+        responseBody.username,
+      );
       const correctPasswordMatch = await password.compare(
         "strongpassword",
         userInDatabase.password,
@@ -74,10 +76,11 @@ describe("[POST] /api/v1/users", () => {
         }),
       });
 
-      const body = await response.json();
-
       expect(response.status).toBe(400);
-      expect(body).toEqual({
+
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
         name: "ValidationError",
         message: "O username informado já está registrado.",
         action: "Utilize outro nome de usuário para realizar esta operação.",
@@ -100,14 +103,47 @@ describe("[POST] /api/v1/users", () => {
         }),
       });
 
-      const body = await response.json();
-
       expect(response.status).toBe(400);
-      expect(body).toEqual({
+
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
         name: "ValidationError",
         message: "O e-mail informado já está registrado.",
         action: "Utilize outro endereço de e-mail para realizar esta operação.",
         status_code: 400,
+      });
+    });
+  });
+
+  describe("Default user", () => {
+    test("it should not be able to register an user with a active session", async () => {
+      const user = await orchestrator.createUser();
+      await orchestrator.activateUserByUserId(user.id);
+      const userSession = await orchestrator.createSession(user.id);
+
+      const response = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `session_id=${userSession.token}`,
+        },
+        body: JSON.stringify({
+          username: user.username,
+          email: user.email,
+          password: user.password,
+        }),
+      });
+
+      expect(response.status).toBe(403);
+
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
+        name: "ForbiddenError",
+        message: "O usuário não possui permissão para executar esta ação.",
+        action: `Verifique se seu usuário possui a feature: "create:user"`,
+        status_code: 403,
       });
     });
   });

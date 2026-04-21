@@ -1,4 +1,5 @@
 import { version as uuidVersion } from "uuid";
+
 import orchestrator from "tests/orchestrator.js";
 
 async function cleanDatabase() {
@@ -24,18 +25,18 @@ describe("[GET] /api/v1/users/[username]", () => {
 
       expect(response.status).toBe(200);
 
-      const body = await response.json();
-      expect(body).toEqual({
-        id: body.id,
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
+        id: responseBody.id,
         username: "JohnDoe",
-        email: body.email,
-        password: body.password,
-        created_at: body.created_at,
-        updated_at: body.updated_at,
+        features: ["read:activation_token"],
+        created_at: responseBody.created_at,
+        updated_at: responseBody.updated_at,
       });
-      expect(uuidVersion(body.id)).toBe(4);
-      expect(Date.parse(body.created_at)).not.toBeNaN();
-      expect(Date.parse(body.updated_at)).not.toBeNaN();
+      expect(uuidVersion(responseBody.id)).toBe(4);
+      expect(Date.parse(responseBody.created_at)).not.toBeNaN();
+      expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
     });
 
     test("it should be able to search username with case mismatch", async () => {
@@ -49,18 +50,18 @@ describe("[GET] /api/v1/users/[username]", () => {
 
       expect(response.status).toBe(200);
 
-      const body = await response.json();
-      expect(body).toEqual({
-        id: body.id,
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
+        id: responseBody.id,
         username: "janedoe",
-        email: body.email,
-        password: body.password,
-        created_at: body.created_at,
-        updated_at: body.updated_at,
+        features: ["read:activation_token"],
+        created_at: responseBody.created_at,
+        updated_at: responseBody.updated_at,
       });
-      expect(uuidVersion(body.id)).toBe(4);
-      expect(Date.parse(body.created_at)).not.toBeNaN();
-      expect(Date.parse(body.updated_at)).not.toBeNaN();
+      expect(uuidVersion(responseBody.id)).toBe(4);
+      expect(Date.parse(responseBody.created_at)).not.toBeNaN();
+      expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
     });
 
     test("it should not be able to search non-existent user", async () => {
@@ -70,8 +71,8 @@ describe("[GET] /api/v1/users/[username]", () => {
 
       expect(response.status).toBe(404);
 
-      const body = await response.json();
-      expect(body).toEqual({
+      const responseBody = await response.json();
+      expect(responseBody).toEqual({
         name: "NotFoundError",
         message: "Não foi possível localizar o usuário informado.",
         action: "Verifique o username informado e tente novamente.",

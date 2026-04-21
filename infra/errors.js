@@ -19,13 +19,14 @@ class InternalServerError extends Error {
 }
 
 class ServiceError extends Error {
-  constructor({ cause, message }) {
+  constructor({ cause, message, action, context }) {
     super(message || "Serviço indisponível no momento.", {
       cause,
     });
     this.name = "ServiceError";
-    this.action = "Verifique a disponibilidade do serviço.";
+    this.action = action || "Verifique a disponibilidade do serviço.";
     this.statusCode = 503;
+    this.context = context;
   }
 
   toJSON() {
@@ -34,6 +35,7 @@ class ServiceError extends Error {
       message: this.message,
       action: this.action,
       status_code: this.statusCode,
+      context: this.context,
     };
   }
 }
@@ -102,6 +104,27 @@ class UnauthorizedError extends Error {
   }
 }
 
+class ForbiddenError extends Error {
+  constructor({ cause, message, action }) {
+    super(message || "Acesso negado.", {
+      cause,
+    });
+    this.name = "ForbiddenError";
+    this.action =
+      action || "Verifique as features necessárias e tente novamente.";
+    this.statusCode = 403;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.statusCode,
+    };
+  }
+}
+
 class MethodNotAllowedError extends Error {
   constructor() {
     super("O método utilizado não é suportado pelo endpoint.");
@@ -127,4 +150,5 @@ export {
   ValidationError,
   NotFoundError,
   UnauthorizedError,
+  ForbiddenError,
 };

@@ -4,7 +4,8 @@ import { faker } from "@faker-js/faker";
 import database from "infra/database.js";
 import migrator from "models/migrator.js";
 import user from "models/user.js";
-import session from "models/session";
+import session from "models/session.js";
+import activation from "models/activation";
 
 const emailServiceURL = `http://${process.env.EMAIL_HTTP_HOST}:${process.env.EMAIL_HTTP_PORT}`;
 
@@ -78,6 +79,10 @@ async function getLastEmail() {
 
   let lastEmailItem = emailListBody.pop();
 
+  if (!lastEmailItem) {
+    return null;
+  }
+
   const lastEmailContentResponse = await fetch(
     `${emailServiceURL}/messages/${lastEmailItem.id}.plain`,
   );
@@ -85,6 +90,22 @@ async function getLastEmail() {
 
   lastEmailItem.text = lastEmailBody;
   return lastEmailItem;
+}
+
+function extractUUIDFromText(text) {
+  const result = String(text).match(/[0-9a-fA-F-]{36}/);
+  return result ? result[0] : null;
+}
+
+async function activateUserByUserId(userId) {
+  const activatedUser = await activation.activateUserByUserId(userId);
+  return activatedUser;
+}
+
+async function addFeaturesToUser(userId, features) {
+  const updatedUser = await user.addFeatures(userId, features);
+
+  return updatedUser;
 }
 
 const orchestrator = {
@@ -95,6 +116,9 @@ const orchestrator = {
   createSession,
   deleteAllEmails,
   getLastEmail,
+  extractUUIDFromText,
+  activateUserByUserId,
+  addFeaturesToUser,
 };
 
 export default orchestrator;
