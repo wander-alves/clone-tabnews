@@ -1,8 +1,9 @@
 import { version as uuidVersion } from "uuid";
 
-import orchestrator from "tests/orchestrator.js";
-import user from "models/user.js";
+import webserver from "infra/webserver.js";
 import password from "models/password.js";
+import user from "models/user.js";
+import orchestrator from "tests/orchestrator.js";
 
 async function cleanDatabase() {
   await orchestrator.waitForAllServices();
@@ -17,7 +18,7 @@ beforeAll(async () => {
 describe("[POST] /api/v1/users", () => {
   describe("Anonymous user", () => {
     test("it should be able to register an unique and valid user", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/users", {
+      const response = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,7 +65,7 @@ describe("[POST] /api/v1/users", () => {
     test("it should not be able to register a duplicated `username`", async () => {
       const createdUser = await orchestrator.createUser();
 
-      const response = await fetch("http://localhost:3000/api/v1/users", {
+      const response = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +92,7 @@ describe("[POST] /api/v1/users", () => {
     test("it should not be able to register a duplicated `email`", async () => {
       const createdUser = await orchestrator.createUser();
 
-      const response = await fetch("http://localhost:3000/api/v1/users", {
+      const response = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -122,7 +123,7 @@ describe("[POST] /api/v1/users", () => {
       await orchestrator.activateUserByUserId(user.id);
       const userSession = await orchestrator.createSession(user.id);
 
-      const response = await fetch("http://localhost:3000/api/v1/users", {
+      const response = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

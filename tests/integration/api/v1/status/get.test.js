@@ -1,3 +1,4 @@
+import webserver from "infra/webserver.js";
 import orchestrator from "tests/orchestrator.js";
 
 async function cleanDatabase() {
@@ -13,7 +14,7 @@ beforeAll(async () => {
 describe("[GET] /api/v1/status", () => {
   describe("Anonymous user", () => {
     test("it should return current endpoint status with anonymous user", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/status");
+      const response = await fetch(`${webserver.origin}/api/v1/status`);
 
       expect(response.status).toBe(200);
 
@@ -35,7 +36,7 @@ describe("[GET] /api/v1/status", () => {
       await orchestrator.addFeaturesToUser(createdUser.id, ["read:status:all"]);
       const userSession = await orchestrator.createSession(createdUser.id);
 
-      const response = await fetch("http://localhost:3000/api/v1/status", {
+      const response = await fetch(`${webserver.origin}/api/v1/status`, {
         headers: {
           Cookie: `session_id=${userSession.token}`,
         },

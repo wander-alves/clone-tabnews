@@ -1,8 +1,9 @@
 import { version as uuidVersion } from "uuid";
 
-import orchestrator from "tests/orchestrator.js";
-import user from "models/user.js";
+import webserver from "infra/webserver.js";
 import password from "models/password.js";
+import user from "models/user.js";
+import orchestrator from "tests/orchestrator.js";
 
 async function cleanDatabase() {
   await orchestrator.waitForAllServices();
@@ -18,7 +19,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
   describe("Anonymous user", () => {
     test("it should not be able to edit an user when are not authenticated", async () => {
       const response = await fetch(
-        "http://localhost:3000/api/v1/users/inexistentUser",
+        `${webserver.origin}/api/v1/users/inexistentUser`,
         {
           method: "PATCH",
           headers: {
@@ -50,7 +51,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/users/inexistentUser",
+        `${webserver.origin}/api/v1/users/inexistentUser`,
         {
           method: "PATCH",
           headers: {
@@ -87,7 +88,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(user2.id);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${user2.username}`,
+        `${webserver.origin}/api/v1/users/${user2.username}`,
         {
           method: "PATCH",
           headers: {
@@ -124,7 +125,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(createdUser2.id);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser2.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser2.username}`,
         {
           method: "PATCH",
           headers: {
@@ -160,7 +161,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(userB.id);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${userA.username}`,
+        `${webserver.origin}/api/v1/users/${userA.username}`,
         {
           method: "PATCH",
           headers: {
@@ -194,7 +195,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser.username}`,
         {
           method: "PATCH",
           headers: {
@@ -233,7 +234,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser.username}`,
         {
           method: "PATCH",
           headers: {
@@ -275,7 +276,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser.username}`,
         {
           method: "PATCH",
           headers: {
@@ -337,7 +338,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const defaultUser = await orchestrator.createUser();
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${defaultUser.username}`,
+        `${webserver.origin}/api/v1/users/${defaultUser.username}`,
         {
           headers: {
             "Content-Type": "application/json",
