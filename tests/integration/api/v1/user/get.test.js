@@ -1,8 +1,9 @@
 import { version as uuidVersion } from "uuid";
 import setCookieParser from "set-cookie-parser";
 
-import orchestrator from "tests/orchestrator.js";
+import webserver from "infra/webserver.js";
 import session from "models/session.js";
+import orchestrator from "tests/orchestrator.js";
 import dateConverter from "utils/date-converter.js";
 
 async function cleanDatabase() {
@@ -18,7 +19,7 @@ beforeAll(async () => {
 describe("[GET] /api/v1/user", () => {
   describe("Anonymous user", () => {
     test("it should not be able to get user info without a session", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/user/");
+      const response = await fetch(`${webserver.origin}/api/v1/user/`);
 
       expect(response.status).toBe(403);
 
@@ -44,7 +45,7 @@ describe("[GET] /api/v1/user", () => {
         createdUser.id,
       );
 
-      const response = await fetch("http://localhost:3000/api/v1/user/", {
+      const response = await fetch(`${webserver.origin}/api/v1/user/`, {
         headers: {
           Cookie: `session_id=${createdSession.token}`,
         },
@@ -83,6 +84,7 @@ describe("[GET] /api/v1/user", () => {
         path: "/",
         maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
         httpOnly: true,
+        sameSite: "Lax",
       });
     });
 
@@ -110,7 +112,7 @@ describe("[GET] /api/v1/user", () => {
 
       jest.useRealTimers();
 
-      const response = await fetch("http://localhost:3000/api/v1/user/", {
+      const response = await fetch(`${webserver.origin}/api/v1/user/`, {
         headers: {
           Cookie: `session_id=${createdSession.token}`,
         },
@@ -154,12 +156,13 @@ describe("[GET] /api/v1/user", () => {
         path: "/",
         maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
         httpOnly: true,
+        sameSite: "Lax",
       });
     });
 
     test("it should not be able to get user data with invalid session", async () => {
       const invalidSessionToken = `9d960feed5be358fb0ad0830ecda97bdac388d18dd5c1281afae2169b99ccd50a9dfb3fb8515e644ae0a585e8c8edb04`;
-      const response = await fetch("http://localhost:3000/api/v1/user/", {
+      const response = await fetch(`${webserver.origin}/api/v1/user/`, {
         headers: {
           Cookie: `session_id=${invalidSessionToken}`,
         },
@@ -188,7 +191,7 @@ describe("[GET] /api/v1/user", () => {
 
       jest.useRealTimers();
 
-      const response = await fetch("http://localhost:3000/api/v1/user/", {
+      const response = await fetch(`${webserver.origin}/api/v1/user/`, {
         headers: {
           Cookie: `session_id=${createdSession.token}`,
         },

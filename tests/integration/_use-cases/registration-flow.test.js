@@ -14,7 +14,7 @@ describe("Use case: Registration Flow (all sucessful)", () => {
   let responseBody;
   let tokenId;
   test("Create user account", async () => {
-    const response = await fetch("http://localhost:3000/api/v1/users", {
+    const response = await fetch(`${webserver.origin}/api/v1/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -76,7 +76,7 @@ describe("Use case: Registration Flow (all sucessful)", () => {
   });
 
   test("Login", async () => {
-    const response = await fetch("http://localhost:3000/api/v1/sessions", {
+    const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -96,7 +96,7 @@ describe("Use case: Registration Flow (all sucessful)", () => {
   test("Get user information", async () => {
     const createdSession = await orchestrator.createSession(responseBody.id);
 
-    const response = await fetch("http://localhost:3000/api/v1/user", {
+    const response = await fetch(`${webserver.origin}/api/v1/user`, {
       headers: {
         Cookie: `session_id=${createdSession.token}`,
       },

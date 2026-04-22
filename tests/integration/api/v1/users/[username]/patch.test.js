@@ -1,8 +1,9 @@
 import { version as uuidVersion } from "uuid";
 
-import orchestrator from "tests/orchestrator.js";
-import user from "models/user.js";
+import webserver from "infra/webserver.js";
 import password from "models/password.js";
+import user from "models/user.js";
+import orchestrator from "tests/orchestrator.js";
 
 async function cleanDatabase() {
   await orchestrator.waitForAllServices();
@@ -18,7 +19,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
   describe("Anonymous user", () => {
     test("it should not be able to edit an user when are not authenticated", async () => {
       const response = await fetch(
-        "http://localhost:3000/api/v1/users/inexistentUser",
+        `${webserver.origin}/api/v1/users/inexistentUser`,
         {
           method: "PATCH",
           headers: {
@@ -50,7 +51,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/users/inexistentUser",
+        `${webserver.origin}/api/v1/users/inexistentUser`,
         {
           method: "PATCH",
           headers: {
@@ -75,7 +76,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       });
     });
 
-    test("it should not be able to change to a duplicated username", async () => {
+    test("it should not be able to change to a duplicated `username`", async () => {
       await orchestrator.createUser({
         username: "user1",
       });
@@ -87,7 +88,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(user2.id);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${user2.username}`,
+        `${webserver.origin}/api/v1/users/${user2.username}`,
         {
           method: "PATCH",
           headers: {
@@ -124,7 +125,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(createdUser2.id);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser2.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser2.username}`,
         {
           method: "PATCH",
           headers: {
@@ -160,7 +161,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(userB.id);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${userA.username}`,
+        `${webserver.origin}/api/v1/users/${userA.username}`,
         {
           method: "PATCH",
           headers: {
@@ -186,7 +187,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       });
     });
 
-    test("it should be able to change an username", async () => {
+    test("it should be able to change an `username`", async () => {
       const createdUser = await orchestrator.createUser({
         username: "originalUsername",
       });
@@ -194,7 +195,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser.username}`,
         {
           method: "PATCH",
           headers: {
@@ -225,7 +226,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       expect(responseBody.updated_at > responseBody.created_at).toBe(true);
     });
 
-    test("it should be able to change an email", async () => {
+    test("it should be able to change an `email`", async () => {
       const createdUser = await orchestrator.createUser({
         email: "orginalEmail@example.com",
       });
@@ -233,7 +234,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser.username}`,
         {
           method: "PATCH",
           headers: {
@@ -267,7 +268,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       expect(updatedUser.email).toEqual("updatedEmail@example.com");
     });
 
-    test("it should be able to change the password", async () => {
+    test("it should be able to change the `password`", async () => {
       const createdUser = await orchestrator.createUser({
         password: "oldPassword",
       });
@@ -275,7 +276,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser.username}`,
         {
           method: "PATCH",
           headers: {
@@ -324,7 +325,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
   });
 
   describe("Privileged user", () => {
-    test('it should be able to change another user with "update:user:others" feature', async () => {
+    test("it should be able to change another user with `update:user:others` `feature`", async () => {
       const privilegedUser = await orchestrator.createUser();
       await orchestrator.activateUserByUserId(privilegedUser.id);
       await orchestrator.addFeaturesToUser(privilegedUser.id, [
@@ -337,7 +338,7 @@ describe("[PATCH] /api/v1/users/[username]", () => {
       const defaultUser = await orchestrator.createUser();
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${defaultUser.username}`,
+        `${webserver.origin}/api/v1/users/${defaultUser.username}`,
         {
           headers: {
             "Content-Type": "application/json",

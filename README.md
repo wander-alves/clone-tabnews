@@ -39,7 +39,6 @@ Referências: [Ruby On Rails: Migrations Guide](https://guides.rubyonrails.org/a
 
 - id: UUID V4 gerado pelo banco
 - username: Nome de usuário com limite de 30 caracteres.
-  - [Motivação da decisão]()
 - email: E-mail de usuário com limite de 256 caracteres.
   - [Motivação da decisão](https://stackoverflow.com/questions/1199190/what-is-the-optimal-length-for-an-email-address-in-a-database/1199238#1199238)
 - password: E-mail de usuário com limite de 256 caracteres.

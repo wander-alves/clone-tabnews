@@ -1,5 +1,6 @@
 import { version as uuidVersion } from "uuid";
 
+import webserver from "infra/webserver.js";
 import orchestrator from "tests/orchestrator.js";
 
 async function cleanDatabase() {
@@ -20,7 +21,7 @@ describe("[GET] /api/v1/users/[username]", () => {
       });
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser.username}`,
       );
 
       expect(response.status).toBe(200);
@@ -45,7 +46,7 @@ describe("[GET] /api/v1/users/[username]", () => {
       });
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/users/${createdUser.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser.username}`,
       );
 
       expect(response.status).toBe(200);
@@ -66,7 +67,7 @@ describe("[GET] /api/v1/users/[username]", () => {
 
     test("it should not be able to search non-existent user", async () => {
       const response = await fetch(
-        "http://localhost:3000/api/v1/users/Ziriguidum",
+        `${webserver.origin}/api/v1/users/Ziriguidum`,
       );
 
       expect(response.status).toBe(404);

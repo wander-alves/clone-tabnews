@@ -1,3 +1,4 @@
+import webserver from "infra/webserver.js";
 import orchestrator from "tests/orchestrator.js";
 
 async function cleanDatabase() {
@@ -13,7 +14,7 @@ beforeAll(async () => {
 describe("[POST] /api/v1/migrations", () => {
   describe("Anonymous user", () => {
     test("it should not run migrations with anonymous user", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/migrations", {
+      const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
         method: "POST",
       });
 
@@ -36,7 +37,7 @@ describe("[POST] /api/v1/migrations", () => {
       await orchestrator.activateUserByUserId(createdUser.id);
       const userSession = await orchestrator.createSession(createdUser.id);
 
-      const response = await fetch("http://localhost:3000/api/v1/migrations", {
+      const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
         method: "POST",
         headers: {
           Cookie: `session_id=${userSession.token}`,
@@ -65,7 +66,7 @@ describe("[POST] /api/v1/migrations", () => {
         "create:migration",
       ]);
 
-      const response = await fetch("http://localhost:3000/api/v1/migrations", {
+      const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
         method: "POST",
         headers: {
           Cookie: `session_id=${userSession.token}`,
